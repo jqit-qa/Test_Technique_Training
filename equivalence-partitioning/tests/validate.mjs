@@ -71,6 +71,9 @@ assert.match(app, /result\.pass && current\.type === "quiz"/, "本番の理解�
 assert.match(html, /仕様/);
 assert.match(html, /回答/);
 assert.match(html, /自己学習用/);
+assert.match(html, /id="helpButton"[^>]*>使い方<\//, "使い方ボタンは記号を付けずに表示します");
+assert.doesNotMatch(html, />\? 使い方</, "使い方ボタンの不要な記号を表示しません");
+assert.match(css, /\.help-button[^}]*min-width: 64px/, "使い方ボタンの表示幅を確保します");
 assert.equal((html.match(/data-guide-scene/g) || []).length, 5, "使い方には5場面の手動デモが必要です");
 assert.match(html, /id="guidePrev"[\s\S]*＞/, "使い方には前後の場面を切り替える操作が必要です");
 assert.match(app, /function renderGuide[\s\S]*data-guide-scene/, "使い方の場面を手動で切り替えられること");
