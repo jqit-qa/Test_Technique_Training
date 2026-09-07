@@ -75,10 +75,20 @@
     </div>
 
     <dialog id="resultDialog" class="dialog"><div id="resultContent"></div><form method="dialog"><button class="button button-primary" type="submit">解答に戻る</button></form></dialog>
-    <dialog id="helpDialog" class="dialog help-dialog">
-      <h2>使い方</h2>
-      <p>練習問題①・②を終えてから本番問題へ進みます。</p><ol><li><strong>問題を選ぶ</strong>：まず練習問題①から始めます。</li><li><strong>仕様を読む</strong>：上段の条件・期待結果を確認します。</li><li><strong>回答する</strong>：選択肢・入力欄・表で各ステップを解きます。</li><li><strong>答え合わせ</strong>：練習では解説を確認し、本番では仕様を見直します。</li><li><strong>理解度チェック</strong>：本番問題の最後に実施します。</li></ol><p>入力内容と進捗は、このブラウザ内に自動保存されます。</p>
-      <form method="dialog"><button class="button button-primary" type="submit">閉じる</button></form>
+    <dialog id="helpDialog" class="dialog help-dialog" aria-labelledby="helpTitle">
+      <div class="guide-heading"><div><p class="section-number">見たいところだけ確認</p><h2 id="helpTitle">使い方</h2><p>＜ ＞で場面を切り替えながら、操作の流れを確認できます。</p></div><form method="dialog"><button class="dialog-close" type="submit" aria-label="使い方を閉じる">×</button></form></div>
+      <div class="guide-layout">
+        <div class="guide-demo" aria-label="操作デモ"><div class="guide-demo-header"><strong>操作デモ</strong><span id="guideCounter">1 / 5</span></div><div class="guide-demo-stage" aria-live="polite">
+          <section class="guide-scene active" data-guide-scene="0"><p>最初に取り組む問題を選びます</p><div class="demo-courses"><span class="active"><b>01</b> 練習問題①</span><span><b>02</b> 練習問題②</span><span><b>03</b> 本番問題</span></div><i class="demo-pointer" aria-hidden="true">●</i></section>
+          <section class="guide-scene" data-guide-scene="1" hidden><p>回答する前に仕様を読みます</p><div class="demo-spec"><strong>仕様・条件</strong><span></span><span></span><span class="short"></span></div><i class="demo-pointer" aria-hidden="true">●</i></section>
+          <section class="guide-scene" data-guide-scene="2" hidden><p>選択肢や入力欄で回答します</p><div class="demo-table"><b>確認項目</b><span class="selected">選択</span><b>期待結果</b><span>入力</span></div><i class="demo-pointer" aria-hidden="true">●</i></section>
+          <section class="guide-scene" data-guide-scene="3" hidden><p>入力できたら答え合わせをします</p><div class="demo-check"><span>入力内容は自動保存されます</span><button type="button" tabindex="-1">答え合わせ</button></div><i class="demo-pointer" aria-hidden="true">●</i></section>
+          <section class="guide-scene" data-guide-scene="4" hidden><p>本番問題の最後にだけ実施します</p><div class="demo-result"><b>✓ 理解度チェック</b><span>全問正解で完了です。</span></div></section>
+        </div><p class="guide-caption" id="guideCaption">① 問題を選ぶ</p><div class="guide-controls"><button type="button" id="guidePrev" aria-label="前の手順">＜</button><button type="button" id="guideNext" aria-label="次の手順">＞</button></div></div>
+        <ol class="guide-steps"><li class="active"><button type="button" data-guide-step="0"><b>1</b><span><strong>問題を選ぶ</strong><small>練習問題①から順に進めます。</small></span></button></li><li><button type="button" data-guide-step="1"><b>2</b><span><strong>仕様を読む</strong><small>条件と期待結果を確認します。</small></span></button></li><li><button type="button" data-guide-step="2"><b>3</b><span><strong>回答を入力する</strong><small>選択肢・入力欄・表を使って解きます。</small></span></button></li><li><button type="button" data-guide-step="3"><b>4</b><span><strong>答え合わせをする</strong><small>練習では解説を確認し、本番では仕様を見直します。</small></span></button></li><li><button type="button" data-guide-step="4"><b>5</b><span><strong>理解度チェックを完了する <em>本番問題のみ</em></strong><small>本番問題の最後に実施します。</small></span></button></li></ol>
+      </div>
+      <div class="guide-note"><strong>自動保存</strong><span>入力内容と進捗は、このブラウザ内に自動保存されます。</span></div>
+      <form method="dialog" class="guide-footer"><button class="button button-primary" type="submit">わかりました</button></form>
     </dialog>
 
     <script src="data.js"></script>

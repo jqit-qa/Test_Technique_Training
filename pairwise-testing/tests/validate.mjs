@@ -71,6 +71,10 @@ assert.match(app, /result\.pass && current\.type === "quiz"/, "本番の理解�
 assert.match(html, /仕様/);
 assert.match(html, /回答/);
 assert.match(html, /自己学習用/);
+assert.equal((html.match(/data-guide-scene/g) || []).length, 5, "使い方には5場面の手動デモが必要です");
+assert.match(html, /id="guidePrev"[\s\S]*＞/, "使い方には前後の場面を切り替える操作が必要です");
+assert.match(app, /function renderGuide[\s\S]*data-guide-scene/, "使い方の場面を手動で切り替えられること");
+assert.match(app, /data-guide-step/, "使い方は見たい場面を直接選べること");
 assert.doesNotMatch(html, /https?:\/\//, "静的アセットは相対パスにします");
 for (const requiredClass of ["topbar", "page-summary", "course-nav", "section-jump", "spec-panel", "answer-panel", "summary-progress"]) assert.match(html, new RegExp(`class="[^"]*${requiredClass}`), `DT共通レイアウトの${requiredClass}が必要です`);
 assert.match(css, /@media \(max-width: 980px\)[\s\S]*\.course-nav \{ grid-template-columns: 1fr; \}/, "狭い画面では問題ナビを1列にします");

@@ -6,12 +6,31 @@
   const STORAGE_KEY = meta.storageKey;
   const blank = () => ({ version: meta.version, activeExerciseId: exercises[0].id, activeStep: 0, answers: {}, completed: [] });
   let state = load();
+  let guideIndex = 0;
+  const guideCaptions = ["① 問題を選ぶ", "② 仕様を読む", "③ 回答を入力する", "④ 答え合わせをする", "⑤ 本番問題のみ：理解度チェック"];
   const $ = (selector) => document.querySelector(selector);
   const el = {
     nav: $("#exerciseNav"), section: $("#sectionLabel"), title: $("#exerciseTitle"), goal: $("#learningGoal"), specs: $("#specList"),
     tabs: $("#stepTabs"), area: $("#answerArea"), progress: $("#progressLabel"), percent: $("#progressPercent"), save: $("#saveStatus"),
-    reset: $("#resetButton"), check: $("#checkButton"), dialog: $("#resultDialog"), result: $("#resultContent"), help: $("#helpDialog")
+    reset: $("#resetButton"), check: $("#checkButton"), dialog: $("#resultDialog"), result: $("#resultContent"), help: $("#helpDialog"),
+    guideCounter: $("#guideCounter"), guideCaption: $("#guideCaption"), guidePrev: $("#guidePrev"), guideNext: $("#guideNext")
   };
+
+  function renderGuide(index) {
+    guideIndex = (index + guideCaptions.length) % guideCaptions.length;
+    el.help.querySelectorAll("[data-guide-scene]").forEach((scene, sceneIndex) => {
+      const active = sceneIndex === guideIndex;
+      scene.classList.toggle("active", active);
+      scene.hidden = !active;
+    });
+    el.help.querySelectorAll("[data-guide-step]").forEach((item, stepIndex) => {
+      const active = stepIndex === guideIndex;
+      item.closest("li").classList.toggle("active", active);
+      item.setAttribute("aria-current", active ? "step" : "false");
+    });
+    el.guideCounter.textContent = `${guideIndex + 1} / ${guideCaptions.length}`;
+    el.guideCaption.textContent = guideCaptions[guideIndex];
+  }
 
   document.title = `${meta.displayName}技法課題`;
   $("#pageTitle").textContent = `${meta.displayName}技法課題`;
@@ -158,6 +177,9 @@
   });
   el.reset.addEventListener("click", () => { if (!confirm("このステップの入力をリセットしますか？")) return; delete state.answers[exercise().id]?.[step().id]; state.completed = state.completed.filter((item) => item !== key()); save(); render(); });
   el.check.addEventListener("click", validate);
-  $("#helpButton").addEventListener("click", () => el.help.showModal());
+  $("#helpButton").addEventListener("click", () => { renderGuide(0); el.help.showModal(); });
+  el.guidePrev.addEventListener("click", () => renderGuide(guideIndex - 1));
+  el.guideNext.addEventListener("click", () => renderGuide(guideIndex + 1));
+  el.help.querySelectorAll("[data-guide-step]").forEach((item) => item.addEventListener("click", () => renderGuide(Number(item.dataset.guideStep))));
   render();
 })();
