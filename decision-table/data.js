@@ -174,11 +174,6 @@
           label: "理解度チェック",
           type: "quiz",
           prompt: "デシジョンテーブルの使い方について、各問で最も適切なものを1つ選んでください。",
-          notification: {
-            source: "decision-table-assignment",
-            event: "production_quiz_completed",
-            url: "https://script.google.com/macros/s/AKfycbygAfjSXMDKffFoNqGw2AsGSTtw8thyIPcbm3AdxaZE4aGuikqflrrCPYrJxQ818n_K/exec"
-          },
           questions: [
             {
               id: "q1",

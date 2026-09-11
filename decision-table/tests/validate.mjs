@@ -93,7 +93,7 @@ assert.equal(validator.validateCoverageChoice(productionCoverage, 6).pass, false
 const quiz = production.steps.find((step) => step.type === "quiz");
 assert.equal(quiz.questions.length, 4, "理解度チェックは4問あること");
 assert.ok(quiz.questions.every((question) => question.options.length === 4), "各問が4択であること");
-assert.equal(quiz.notification.event, "production_quiz_completed", "本番の理解度チェックだけが完了通知を送ること");
+assert.equal(quiz.notification, undefined, "公開クライアントに通知Webhookを持たせないこと");
 const correctQuizAnswers = Object.fromEntries(quiz.questions.map((question) => [question.id, String(question.answer)]));
 assert.equal(validator.validateQuiz(quiz, correctQuizAnswers).pass, true, "理解度チェックの正答を受理");
 assert.equal(validator.validateQuiz(quiz, { ...correctQuizAnswers, q1: "0" }).pass, false, "理解度チェックの誤答を検出");
@@ -113,7 +113,7 @@ assert.ok(html.includes('id="helpButton"') && html.includes(">使い方</button>
 assert.equal((html.match(/data-guide-scene=/g) || []).length, 5, "操作デモが5場面あること");
 assert.equal((html.match(/data-guide-step=/g) || []).length, 5, "操作手順が5段階で説明されること");
 assert.ok(html.includes("練習問題から本番問題まで進めてください"), "練習問題から本番問題へ進む流れを案内すること");
-assert.ok(html.includes("理解度チェックに全問正解すると、リーダーへ完了通知"), "理解度チェック全問正解時の通知条件を案内すること");
+assert.ok(html.includes("理解度チェックに全問正解したら、完了画面をリーダーへ提示"), "理解度チェック全問正解後に完了画面を提示することを案内すること");
 assert.ok(html.includes("本番問題の最後に実施します") && html.includes("本番問題のみ"), "理解度チェックが本番問題だけであると明記すること");
 for (const control of ["guidePrev", "guideNext"]) {
   assert.ok(html.includes(`id="${control}"`), `${control}: 操作デモを手動操作できること`);
@@ -122,6 +122,7 @@ assert.ok(!html.includes("guideReplay"), "使い方に不要な再生ボタン�
 
 const appSource = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
 const cssSource = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+const dataSource = fs.readFileSync(new URL("../data.js", import.meta.url), "utf8");
 assert.ok(!appSource.includes("guideReplay"), "使い方の不要な再生処理を残さないこと");
 assert.ok(appSource.includes("210 + columns.length * 56"), "列数に応じて表幅を計算すること");
 assert.ok(appSource.includes("表は左右にスクロールできます"), "横長表にスクロール案内があること");
@@ -151,9 +152,13 @@ assert.ok(appSource.includes('!result.pass && exercise.id === "production"\n    
 assert.match(cssSource, /\.reference-table\s*\{[^}]*min-width:\s*520px;/s, "最小化の解答例を横スクロール可能な表で表示すること");
 assert.ok(appSource.includes("course-copy") && appSource.includes("exercise.navLabel"), "コース選択に問題種別と学習テーマを併記すること");
 assert.match(appSource, /result\.pass && step\.type === "quiz"/, "理解度チェックの正答・解説は合格後にだけ表示すること");
-assert.ok(appSource.includes("sendCompletionNotification"), "理解度チェック全問正解時に通知を送ること");
+assert.ok(!appSource.includes("sendCompletionNotification") && !appSource.includes("mode: \"no-cors\""), "公開クライアントから通知Webhookを直接呼ばないこと");
+assert.ok(!/script\.google\.com\/macros/.test(dataSource), "公開データにWebhook URLを含めないこと");
+assert.ok(appSource.includes("完了画面をリーダーへ提示してください"), "理解度チェック完了後は完了画面を提示すること");
 assert.match(appSource, /activeStep\(\)\.type === "quiz" && event\.target\.type === "radio"/, "受講者名の入力中に理解度チェック全体を再描画しないこと");
-assert.match(cssSource, /\.notification-name\s*\{[^}]*margin-bottom:\s*28px;/s, "受講者名と問1の間に十分な間隔を設けること");
+assert.match(cssSource, /conic-gradient\(var\(--green\) var\(--progress\)/, "進捗を円形リングとして表示すること");
+assert.match(cssSource, /@media \(max-width: 980px\)[\s\S]*?\.summary-progress\s*\{[^}]*min-width:\s*126px;/, "タブレット幅でも進捗表示を残すこと");
+assert.match(cssSource, /\.learning-goal\s*\{[^}]*overflow-wrap:\s*anywhere;/s, "幅を問わず長い仕様文を折り返すこと");
 assert.ok(!appSource.includes("setInterval"), "操作デモを自動送りしないこと");
 assert.ok(appSource.includes('querySelectorAll("[data-guide-step]")'), "見たい手順を直接選べること");
 assert.ok(cssSource.includes("prefers-reduced-motion: reduce"), "動きを抑える端末設定に対応すること");
