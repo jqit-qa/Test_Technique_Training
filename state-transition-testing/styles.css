@@ -30,6 +30,7 @@ button { cursor: pointer; }
 .brand small { margin-top: 3px; color: var(--muted); font-size: 10px; }
 .topbar-actions { display: flex; align-items: center; gap: 12px; }
 .version { color: var(--muted); font-size: 12px; }
+.back-button { min-height: 34px; padding: 0 10px; display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); background: var(--card); font-size: 11px; font-weight: 800; text-decoration: none; white-space: nowrap; }.back-button:hover, .back-button:focus-visible { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 .help-button { min-width: 64px; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 4px; color: var(--primary); background: var(--card); font-size: 11px; font-weight: 800; white-space: nowrap; }
 
 main { width: min(1320px, calc(100% - clamp(32px, 8vw, 112px))); margin: 0 auto; padding-bottom: 64px; }

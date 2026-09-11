@@ -72,6 +72,8 @@ assert.match(html, /仕様/);
 assert.match(html, /回答/);
 assert.match(html, /自己学習用/);
 assert.match(html, /id="helpButton"[^>]*>使い方<\//, "使い方ボタンは記号を付けずに表示します");
+assert.match(html, /class="back-button" href="\.\.\/">一覧に戻る<\//, "一覧へ戻る明示的な導線があること");
+assert.match(css, /\.back-button\s*\{[^}]*text-decoration:\s*none;/s, "一覧へ戻る導線をボタンとして表示すること");
 assert.doesNotMatch(html, />\? 使い方</, "使い方ボタンの不要な記号を表示しません");
 assert.match(css, /\.help-button[^}]*min-width: 64px/, "使い方ボタンの表示幅を確保します");
 assert.equal((html.match(/data-guide-scene/g) || []).length, 5, "使い方には5場面の手動デモが必要です");

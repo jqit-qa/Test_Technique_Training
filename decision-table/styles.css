@@ -32,6 +32,7 @@ button { cursor: pointer; }
 .brand small { margin-top: 3px; color: var(--muted); font-size: 10px; }
 .topbar-actions { display: flex; align-items: center; gap: 12px; }
 .version { color: var(--muted); font-size: 12px; }
+.back-button { min-height: 36px; padding: 0 10px; display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); background: white; font-size: 11px; font-weight: 800; text-decoration: none; white-space: nowrap; }.back-button:hover, .back-button:focus-visible { border-color: var(--green); color: var(--green); background: var(--green-soft); }
 .help-button { min-height: 36px; padding: 0 12px 0 8px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 4px; color: var(--green); background: var(--card); font-size: 12px; font-weight: 800; }
 .help-button:hover, .help-button:focus-visible { border-color: var(--green); background: var(--green-soft); }
 .help-button span { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 3px; color: white; background: var(--green); font-size: 11px; }

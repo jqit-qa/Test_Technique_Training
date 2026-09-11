@@ -157,6 +157,8 @@ assert.match(cssSource, /\.notification-name\s*\{[^}]*margin-bottom:\s*28px;/s, 
 assert.ok(!appSource.includes("setInterval"), "操作デモを自動送りしないこと");
 assert.ok(appSource.includes('querySelectorAll("[data-guide-step]")'), "見たい手順を直接選べること");
 assert.ok(cssSource.includes("prefers-reduced-motion: reduce"), "動きを抑える端末設定に対応すること");
+assert.match(html, /class="back-button" href="\.\.\/">一覧に戻る<\//, "一覧へ戻る明示的な導線があること");
+assert.match(cssSource, /\.back-button\s*\{[^}]*text-decoration:\s*none;/s, "一覧へ戻る導線をボタンとして表示すること");
 assert.ok(!/Georgia|Yu Mincho/.test(cssSource), "明朝・セリフ体を使用しないこと");
 assert.ok(cssSource.includes('--font-sans: -apple-system'), "OS標準のゴシック体スタックを使用すること");
 assert.match(cssSource, /\.guide-layout\s*\{[^}]*grid-template-columns:/s, "操作デモと手順を見比べられること");
