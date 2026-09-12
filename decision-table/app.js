@@ -341,12 +341,46 @@
   }
 
   function renderQuiz(step, values) {
-    return `<div class="quiz-list">${step.questions.map((question, questionIndex) => {
+    const notificationField = step.notification ? `<label class="notification-name form-field"><span>受講者名（リーダー通知に表示）</span><input type="text" data-field="learnerName" value="${escapeHtml(values.learnerName ?? "")}" placeholder="例：山田 太郎" autocomplete="name" /></label>` : "";
+    return `${notificationField}<div class="quiz-list">${step.questions.map((question, questionIndex) => {
       const selected = Number(values[question.id]);
       return `<fieldset class="quiz-question"><legend><span>問${questionIndex + 1}</span>${escapeHtml(question.text)}</legend><div class="quiz-options">${question.options.map((option, optionIndex) => `
         <label class="quiz-option ${selected === optionIndex ? "selected" : ""}"><input type="radio" name="${question.id}" data-field="${question.id}" value="${optionIndex}" ${selected === optionIndex ? "checked" : ""} /><span>${escapeHtml(option)}</span></label>
       `).join("")}</div></fieldset>`;
     }).join("")}</div>`;
+  }
+
+  function createAttemptId() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    return `dt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  async function sendCompletionNotification(step, answer) {
+    if (!step.notification || answer.fields.notificationSent) return;
+    answer.fields.notificationAttemptId ||= createAttemptId();
+    const status = elements.resultContent.querySelector("#notificationStatus");
+    if (status) status.textContent = "リーダーへ完了通知を送信しています…";
+    try {
+      const response = await fetch(step.notification.url, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
+        body: JSON.stringify({
+          source: step.notification.source,
+          event: step.notification.event,
+          name: answer.fields.learnerName.trim(),
+          attemptId: answer.fields.notificationAttemptId,
+          correct: step.questions.length
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.ok) throw new Error("Notification relay rejected the request");
+      answer.fields.notificationSent = true;
+      saveState();
+      if (status) status.textContent = "リーダーへの完了通知を送信しました。";
+    } catch (_) {
+      if (status) status.textContent = "通知を送信できませんでした。通信を確認して、もう一度答え合わせをしてください。";
+    }
   }
 
   function handleCellClick(button) {
@@ -480,6 +514,9 @@
       result = validator.validateCoverageChoice(step, answer.fields.denominator);
     } else if (step.type === "quiz") {
       result = validator.validateQuiz(step, answer.fields);
+      if (step.notification && !String(answer.fields.learnerName || "").trim()) {
+        result = { pass: false, issues: [...result.issues, "リーダー通知に表示する受講者名を入力してください。"] };
+      }
     } else if (step.type === "ruleCount") {
       const columns = usedMinimizedColumns(exercise);
       const issues = [];
@@ -564,12 +601,13 @@
       ${result.issues.length ? `<ul class="issue-list">${result.issues.slice(0, 8).map((issue) => `<li>${escapeHtml(issue)}</li>`).join("")}</ul>` : ""}
       ${answerBlock}
       ${!result.pass && step.type === "quiz" ? "<p class=\"result-tip\">正しい選択肢と解説は、全問正解したあとに表示されます。まずは問題文とヒントを見直してください。</p>" : ""}
-      ${result.pass && step.type === "quiz" && exercise.id === "production" ? "<p class=\"result-tip\">完了画面をリーダーへ提示してください。</p>" : ""}
+      ${result.pass && step.notification ? "<p class=\"result-tip notification-status\" id=\"notificationStatus\">リーダーへの完了通知を準備しています…</p>" : ""}
       ${result.pass && exercise.explanations ? `<p class="result-tip">${escapeHtml(exercise.explanations[Math.min(state.activeStep, exercise.explanations.length - 1)])}</p>` : ""}`;
     const next = result.pass ? nextTarget(exercise, state.activeStep) : null;
     elements.resultNext.hidden = !next;
     if (next) elements.resultNext.textContent = next.label;
     elements.resultDialog.showModal();
+    if (result.pass && step.notification) sendCompletionNotification(step, getAnswer(exercise, step));
     renderExercise();
   }
 
